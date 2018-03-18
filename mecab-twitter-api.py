@@ -34,7 +34,7 @@ def get_user(userId):
   user = userId
 
   try:
-    place_list_rank = get_tweets_place_list.get_tweets_place_list(user) # error judge
+    place_list_rank, place_list_srctwt = get_tweets_place_list.get_tweets_place_list(user) # error judge
     place_name = place_list_rank[0][0] # data existance judge
     place_cnt = place_list_rank[0][1] # data existance judge
   except:
@@ -66,7 +66,8 @@ def get_user(userId):
     "result":True,
     "data":{
       "userId":user,
-      "rank":rank_list 
+      "rank":rank_list,
+      "src_place_twt": place_list_srctwt
     }
   }
 

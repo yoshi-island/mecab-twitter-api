@@ -59,7 +59,7 @@ def get_tweets(user,oath):
   url = "https://api.twitter.com/1.1/statuses/user_timeline.json?"
   params = {
     "screen_name": user,
-    "count": "500"
+    "count": "1000"
     }
   oath = oath
   responce = oath.get(url, params = params)
@@ -83,25 +83,25 @@ def get_tweets(user,oath):
 # mecab_analyze_tweets
 ###################
 def mecab_analyze_tweets(tweets_text_list):
-  tweets_text_list = tweets_text_list
-
+  tweets_text_list = tweets_text_list.split("\n")
   mecab = MeCab.Tagger("-Ochasen")
-  mecab_parsed = mecab.parse(tweets_text_list).split("\n")
-
   place_list = []
-  for l in mecab_parsed:
-    items = l.split("\t")
-    if len(items)>4:
-      if items[3].find("地域") > -1:
-        if len(items[0]) > 1:
-          if items[0] != "日本":
-            place_list.append(items[0])
-
+  place_list_srctwt = []
+  for l in tweets_text_list:
+    if len(l) > 0:
+      mecab_parsed = mecab.parse(l)
+      items = mecab_parsed.split("\t")
+      if len(items)>4:
+        if items[3].find("地域") > -1:
+          if len(items[0]) > 1:
+            if items[0] != "日本":
+              place_list.append(items[0])
+              place_list_srctwt.append(l)
 
   count_dict = collections.Counter(place_list)  
   place_list_rank = count_dict.most_common(10)
 
-  return place_list_rank
+  return place_list_rank,place_list_srctwt
 
 
 
@@ -112,6 +112,5 @@ def mecab_analyze_tweets(tweets_text_list):
 def get_tweets_place_list(user):
   oath = session_create(oath_keys)
   tweets_text_list = get_tweets(user,oath) # list
-  place_list_rank = mecab_analyze_tweets(tweets_text_list) # list
-  return place_list_rank
-  #print(place_list_rank)
+  place_list_rank,place_list_srctwt = mecab_analyze_tweets(tweets_text_list) # list
+  return place_list_rank, place_list_srctwt
