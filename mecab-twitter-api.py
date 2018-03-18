@@ -11,11 +11,8 @@ import get_tweets_place_list
 from flask import Flask, jsonify, abort, make_response
 import netifaces
 import json
+from flask_cors import CORS
 
-
-
-#place_list_rank = get_tweets_place_list.get_tweets_place_list("@r_otake0818")
-#[('日本', 30), ('北朝鮮', 3), ('韓国', 3), ('梅田', 2), ('中国', 2), ('大阪', 2), ('朝鮮', 2), ('ウクライナ', 2), ('アメリカ', 1), ('ブラジル', 1)]
 
 
 ###################
@@ -29,6 +26,7 @@ sv_ip = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
 ###################
 
 api = Flask(__name__)
+CORS(api)
 api.config['JSON_AS_ASCII'] = False # for Japanese language
 
 @api.route('/getTweetsPlace/<string:userId>', methods=['GET'])
@@ -49,7 +47,7 @@ def get_user(userId):
       "count": place_cnt
     }]
 
-  for i in range (1,5):
+  for i in range (2,6):
     place_name = ""
     place_cnt = ""
     try: 
