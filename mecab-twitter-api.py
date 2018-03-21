@@ -11,7 +11,8 @@ import get_tweets_place_list
 from flask import Flask, jsonify, abort, make_response
 import netifaces
 import json
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
+import ssl
 
 
 
@@ -28,6 +29,8 @@ sv_ip = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
 api = Flask(__name__)
 CORS(api)
 api.config['JSON_AS_ASCII'] = False # for Japanese language
+context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+context.load_cert_chain('cert.crt', 'server_secret.key')
 
 @api.route('/getTweetsPlace/<string:userId>', methods=['GET'])
 def get_user(userId):
@@ -73,10 +76,17 @@ def get_user(userId):
 
   return make_response(jsonify(result))
 
+@api.after_request
+def after_request(response):
+  response.headers.add('Access-Control-Allow-Origin', '*')
+  response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+  response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+  return response
+
 
 @api.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 if __name__ == '__main__':
-    api.run(host=sv_ip, port=3000)
+    api.run(host=sv_ip, port=3000, ssl_context=context, threaded=True, debug=True)
