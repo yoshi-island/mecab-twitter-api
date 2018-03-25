@@ -13,7 +13,10 @@ import netifaces
 import json
 from flask_cors import CORS, cross_origin
 import ssl
+import passwords
 
+cert_path=passwords.cert_path
+key_path=passwords.key_path
 
 
 ###################
@@ -30,7 +33,7 @@ api = Flask(__name__)
 CORS(api)
 api.config['JSON_AS_ASCII'] = False # for Japanese language
 context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-context.load_cert_chain('cert.crt', 'server_secret.key')
+context.load_cert_chain(cert_path, key_path)
 
 @api.route('/getTweetsPlace/<string:userId>', methods=['GET'])
 def get_user(userId):
